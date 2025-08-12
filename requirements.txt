@@ -1,0 +1,7 @@
+psutil
+GPUtil
+pynvml-wheels
+pandas
+requests
+huggingface-hub
+datasets
