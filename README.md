@@ -30,8 +30,9 @@ Profiles your hardware configuration and generates compatibility reports.
 ![Hardware Profile](https://github.com/user-attachments/assets/1823c3c7-e719-4493-9f8c-1c50976412f4)
 
 ### 2. Model Optimization
+the model files should be from huggingface - https://huggingface.co/models
 ```bash
-python quantize.py \
+python aqeng.py \
     --workspace-dir "/media/user/fast_ssd/llm_projects" \
     --repo-id "NousResearch/Hermes-2-Pro-Llama-3-8B-GGUF" \
     --filename "Hermes-2-Pro-Llama-3-8B-F16.gguf" \
