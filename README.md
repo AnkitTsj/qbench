@@ -1,17 +1,29 @@
-# QBench - LLM Quantization & Hardware Optimization
+# QBench – Automated LLM Quantization & Hardware Optimization
 
-A CLI tool for automated quantization, benchmarking, and hardware-specific optimization of Large Language Models. QBench eliminates guesswork by profiling your system, testing multiple quantization schemes, and providing data-driven recommendations.
+Stop wasting hours guessing which quantization format runs best on your machine.
+QBench profiles your hardware, tests multiple formats, benchmarks speed/memory/quality, and tells you exactly which configuration gives you the best results for your needs.
 
-## Overview
+---
 
-QBench automates the model optimization workflow:
-- Hardware profiling and compatibility analysis
-- Automated quantization to multiple formats
-- Performance benchmarking (speed, memory, quality)
-- Hardware-aware configuration recommendations
-- Integration with custom optimization kernels
+## Why QBench
 
-## Installation
+Optimizing an LLM for your hardware is usually trial-and-error:
+
+* Which quantization should I use?
+* How many GPU layers can I offload without running out of memory?
+* What’s the speed trade-off if I go for higher quality?
+
+QBench removes the guesswork:
+
+1. **Profiles your system** – detects GPU, memory limits, and capabilities.
+2. **Tests multiple quantization formats** – in one automated run.
+3. **Benchmarks performance, memory, and quality** – using real metrics.
+4. **Recommends the optimal setup** – based on your chosen priority: speed, quality, memory, or balance.
+5. **Generates ready-to-use commands** – so you can deploy immediately.
+
+---
+
+## Quick Start
 
 ```bash
 git clone https://github.com/AnkitTsj/qbench.git
@@ -19,183 +31,121 @@ cd qbench
 pip install -r requirements.txt
 ```
 
-## Usage
+---
 
-### 1. System Analysis
+## Example Workflow
+
+### 1. Profile your hardware
+
 ```bash
 python preprocess.py
 ```
-Profiles your hardware configuration and generates compatibility reports.
 
-![Hardware Profile](https://github.com/user-attachments/assets/1823c3c7-e719-4493-9f8c-1c50976412f4)
+Generates a compatibility report with GPU specs, available memory, and performance estimates.
 
-### 2. Model Optimization
-the model files should be from huggingface - https://huggingface.co/models
+---
+
+### 2. Optimize a model
+
 ```bash
 python aqeng.py \
-    --workspace-dir "/media/user/fast_ssd/llm_projects" \
+    --workspace-dir "/path/to/workspace" \
     --repo-id "NousResearch/Hermes-2-Pro-Llama-3-8B-GGUF" \
     --filename "Hermes-2-Pro-Llama-3-8B-F16.gguf" \
     --local-filename "hermes-l3-8b-f16.gguf" \
     --gpu-layers 45 \
     --target-formats "q4_k_m" "q6_k" "q8_0" \
-    --use-case "performance" \
-    --kernels-repo "https://my.custom.repo/kernels/main" \
-    --force-rebuild
+    --use-case "performance"
 ```
 
-### 3. Results Analysis
-The tool generates comprehensive benchmark reports with performance metrics, memory usage, and quality scores.
+QBench will:
 
-![Benchmark Results](https://github.com/user-attachments/assets/701d0997-6297-4252-bab4-3f0b2eccbc69)
+* Download the model
+* Quantize it into the specified formats
+* Benchmark speed, memory use, and quality
+* Recommend the best performing setup
 
-### 4. Deployment
-Ready-to-use commands for optimal configurations:
+---
 
-![Run Command](https://github.com/user-attachments/assets/72b430be-6118-4374-b47a-837af64a5f0e)
+### 3. View results
 
-## Command Reference
+Outputs include:
 
-### quantize.py
+* **Markdown report** – readable summary of results and recommendations
+* **CSV** – detailed benchmark metrics for analysis
+* **JSON** – structured data for automation
 
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `--workspace-dir` | string | Working directory for models and outputs |
-| `--repo-id` | string | HuggingFace repository identifier |
-| `--filename` | string | Source model filename |
-| `--local-filename` | string | Local filename for downloaded model |
-| `--gpu-layers` | int | Number of layers to offload to GPU |
-| `--target-formats` | list | Quantization formats to benchmark |
-| `--use-case` | string | Optimization target: performance/quality/memory/balanced |
-| `--kernels-repo` | string | Custom kernel repository URL (optional) |
-| `--force-rebuild` | flag | Force rebuild existing quantizations |
+Example (performance mode):
 
-## Quantization Formats
+| Format   | Tokens/sec | VRAM (GB) | Quality Score | Recommendation   |
+| -------- | ---------- | --------- | ------------- | ---------------- |
+| q4\_k\_m | 42.1       | 4.8       | 87.2          | Best for speed   |
+| q6\_k    | 32.7       | 6.3       | 93.5          |                  |
+| q8\_0    | 25.4       | 7.9       | 98.2          |                  |
 
-| Format | Bits | Description | Use Case |
-|--------|------|-------------|----------|
-| `q4_k_m` | 4-bit | K-means quantization, mixed precision | Balanced performance/quality |
-| `q5_k_m` | 5-bit | Higher precision K-means | Quality-focused deployments |
-| `q6_k` | 6-bit | High quality quantization | Quality-critical applications |
-| `q8_0` | 8-bit | Minimal quality loss | High-quality baseline |
+---
 
-## Optimization Strategies
+## Command Options
 
-### Performance Mode
-```bash
---use-case "performance"
-```
-Maximizes inference speed. Weights: 60% speed, 25% quality, 15% memory efficiency.
+| Parameter          | Type   | Description                                       |
+| ------------------ | ------ | ------------------------------------------------- |
+| `--workspace-dir`  | string | Directory for models and outputs                  |
+| `--repo-id`        | string | Hugging Face model repo                           |
+| `--filename`       | string | Source model filename                             |
+| `--local-filename` | string | Local filename                                    |
+| `--gpu-layers`     | int    | Layers to offload to GPU                          |
+| `--target-formats` | list   | Quant formats to test                             |
+| `--use-case`       | string | `performance` / `quality` / `memory` / `balanced` |
+| `--kernels-repo`   | string | Optional custom kernels repo                      |
+| `--force-rebuild`  | flag   | Rebuild quantizations even if cached              |
 
-### Quality Mode
-```bash
---use-case "quality"
-```
-Prioritizes model accuracy. Weights: 20% speed, 60% quality, 20% memory efficiency.
+---
 
-### Memory Mode
-```bash
---use-case "memory"
-```
-Minimizes memory footprint. Weights: 30% speed, 30% quality, 40% memory efficiency.
+## Supported Quantization Formats
 
-### Balanced Mode
-```bash
---use-case "balanced"
-```
-Equal weighting across all metrics. Weights: 40% speed, 40% quality, 20% memory efficiency.
+| Format   | Bits  | Description               | Use Case        |
+| -------- | ----- | ------------------------- | --------------- |
+| q4\_k\_m | 4-bit | K-means mixed precision   | Balanced        |
+| q5\_k\_m | 5-bit | Higher-precision K-means  | Higher quality  |
+| q6\_k    | 6-bit | High quality quantization | Quality-focused |
+| q8\_0    | 8-bit | Minimal quality loss      | High fidelity   |
 
-## Benchmarking Metrics
+---
 
-QBench measures and reports:
+## Optimization Modes
 
-**Performance Metrics:**
-- Prompt processing speed (tokens/sec)
-- Text generation speed (tokens/sec)
-- Model loading time
-- First token latency
+| Mode        | Focus                              |
+| ----------- | ---------------------------------- |
+| performance | Max speed, small quality trade-off |
+| quality     | Highest possible accuracy          |
+| memory      | Lowest memory footprint            |
+| balanced    | Good across all metrics            |
 
-**Resource Utilization:**
-- Peak memory usage (RAM/VRAM)
-- Average GPU utilization
-- Power consumption (when available)
+---
 
-**Quality Assessment:**
-- Perplexity scores on standard datasets
-- Quality retention vs baseline
+## Metrics Collected
 
-**System Compatibility:**
-- Hardware compatibility scoring
-- Memory requirement validation
-- Performance prediction confidence
+* **Performance** – tokens/sec, load time, first-token latency
+* **Memory** – peak RAM/VRAM usage
+* **Quality** – perplexity vs. original model
+* **Compatibility** – passes/fails based on system limits
 
-## Architecture
-
-### Core Components
-
-- **HardwareProfiler**: System analysis and capability detection
-- **QuantizationAnalyzer**: Model quantization and benchmarking engine  
-- **ResourceMonitor**: Real-time performance monitoring
-- **OptimizationEngine**: Multi-objective configuration scoring
-
-### Integration Points
-
-- llama.cpp for quantization and inference
-- HuggingFace Hub for model management
-- Custom kernel repositories for hardware-specific optimizations
-
-## Advanced Configuration
-
-### Custom Kernels
-```bash
---kernels-repo "https://github.com/username/optimized-kernels"
-```
-Integrates hardware-specific optimization kernels (CUDA, Nim, etc.)
-
-### Batch Processing
-```bash
-# Process multiple models from file
-python quantize.py --batch-file models.txt
-```
-
-### Continuous Optimization
-```bash
-# Monitor and re-optimize based on usage patterns  
-python quantize.py --continuous --monitor-interval 24h
-```
-
-## Output Formats
-
-Results are saved in multiple formats:
-- CSV: Machine-readable benchmark data
-- JSON: Structured configuration recommendations  
-- Markdown: Human-readable analysis reports
+---
 
 ## Requirements
 
-**System:**
-- Python 3.8+
-- CUDA toolkit (for GPU acceleration)
-- 8GB+ RAM recommended
+* Python 3.8+
+* CUDA toolkit (for GPU acceleration)
+* 8GB+ RAM recommended
 
-**Dependencies:**
-- psutil (system monitoring)
-- pandas (data analysis)
-- huggingface-hub (model downloads)
-- pynvml (NVIDIA GPU monitoring)
+Dependencies: `psutil`, `pandas`, `huggingface-hub`, `pynvml`
+
+---
 
 ## Contributing
 
-Contributions are welcome. Please ensure:
-- Code follows existing patterns
-- New features include appropriate tests
-- Documentation is updated for API changes
-- Performance impact is measured and documented
+Pull requests and issues are welcome. Please include:
 
-## Issues
-
-Report bugs or feature requests via GitHub Issues. Include:
-- Hardware specifications
-- Command executed
-- Error output or unexpected behavior
-- System environment details
+* Hardware specs
+* Command run
+* Output/error details
