@@ -1,6 +1,6 @@
 psutil
 GPUtil
-pynvml-wheels
+pynvml
 pandas
 requests
 huggingface-hub
