@@ -1,7 +1,8 @@
-psutil
-GPUtil
-pynvml
-pandas
-requests
-huggingface-hub
 datasets
+GPUtil
+huggingface-hub
+pandas
+psutil
+py-cpuinfo
+pynvml
+requests
