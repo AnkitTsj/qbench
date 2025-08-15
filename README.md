@@ -137,6 +137,7 @@ Example (performance mode):
 * Python 3.8+
 * CUDA toolkit (for GPU acceleration)
 * 8GB+ RAM recommended
+* cmake and gcc compiler 
 
 Dependencies: `psutil`, `pandas`, `huggingface-hub`, `pynvml`
 
