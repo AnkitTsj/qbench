@@ -1,29 +1,17 @@
-import psutil
-import subprocess
-import pandas as pd
-import time
-from hp import HardwareProfiler
 import os
 import re
-import pandas as pd
-import threading
-import uuid
-import argparse
-from datetime import datetime
-
-try:
-    import psutil
-except ImportError:
-    psutil = None
-
-try:
-    import pynvml
-    pynvml.nvmlInit()
-    NVML_AVAILABLE = True
-except ImportError:
-    NVML_AVAILABLE = False
 import psutil
 import socket
+import uuid
+import time
+import threading
+import argparse
+import subprocess
+import pandas as pd
+from datetime import datetime
+
+from hp import HardwareProfiler
+
 try:
     import cpuinfo
 except ImportError:
@@ -33,6 +21,24 @@ try:
     import GPUtil
 except ImportError:
     GPUtil = None
+
+try:
+    import pynvml
+    try:
+        pynvml.nvmlInit()
+        NVML_AVAILABLE = True
+    except pynvml.NVMLError_LibraryNotFound:
+        print("No NVIDIA NVML library found. Skipping GPU monitoring.")
+        NVML_AVAILABLE = False
+    except pynvml.NVMLError as err:
+        print(f"NVML initialization failed: {err}")
+        NVML_AVAILABLE = False
+except ImportError:
+    NVML_AVAILABLE = False
+
+
+
+
 
 def get_system_profile():
     """
